@@ -36,7 +36,13 @@
 
         <!-- Admin Panel -->
         <div id="admin-panel" class="card hidden">
-            <div class="card-header">Admin Panel - Question Management</div>
+            <div class="card-header">
+                Admin Panel - Question Management
+                <div style="float: right;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="changeAdminPassword()">🔑 Change Password</button>
+                    <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;" onclick="logoutAdmin()">🚪 Logout</button>
+                </div>
+            </div>
             
             <div class="form-group">
                 <button class="btn btn-success" onclick="showAddQuestionForm()">➕ Add New Question</button>
@@ -330,6 +336,26 @@
         </div>
     </div>
 
+    <!-- Password Modal -->
+    <div id="password-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">🔐 Admin Panel Access</div>
+            <p>Please enter the admin password to access the question management system.</p>
+            <div class="form-group">
+                <label for="admin-password">Password:</label>
+                <input type="password" id="admin-password" placeholder="Enter password" onkeypress="handlePasswordKeypress(event)">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="verifyPassword()">Access</button>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #718096;">
+                Default password: <strong>admin123</strong><br>
+                Change this in the Admin Panel after logging in.
+            </p>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script>
         // Application State
@@ -460,6 +486,15 @@
 
         // Navigation Functions
         function showSection(sectionId) {
+            // Check for admin panel password protection
+            if (sectionId === 'admin-panel' || sectionId === 'admin') {
+                // Check if user is already authenticated
+                if (!sessionStorage.getItem('adminAuthenticated')) {
+                    showPasswordModal();
+                    return;
+                }
+            }
+
             // Hide all sections
             const sections = ['main-menu', 'admin-panel', 'add-question-form', 'exam-config', 'exam-interface', 'results-view', 'detailed-results'];
             sections.forEach(section => {
@@ -1134,6 +1169,61 @@
 
         function closeModal() {
             document.getElementById('confirm-modal').classList.remove('active');
+        }
+
+        // Password Protection Functions
+        function showPasswordModal() {
+            document.getElementById('password-modal').classList.add('active');
+            document.getElementById('admin-password').value = '';
+            document.getElementById('admin-password').focus();
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.remove('active');
+        }
+
+        function handlePasswordKeypress(event) {
+            if (event.key === 'Enter') {
+                verifyPassword();
+            }
+        }
+
+        function verifyPassword() {
+            const enteredPassword = document.getElementById('admin-password').value;
+            const storedPassword = localStorage.getItem('adminPassword') || 'admin123'; // Default password
+
+            if (enteredPassword === storedPassword) {
+                // Password correct
+                sessionStorage.setItem('adminAuthenticated', 'true');
+                closePasswordModal();
+                showSection('admin-panel');
+            } else {
+                // Password incorrect
+                alert('Incorrect password. Please try again.');
+                document.getElementById('admin-password').value = '';
+                document.getElementById('admin-password').focus();
+            }
+        }
+
+        function changeAdminPassword() {
+            const newPassword = prompt('Enter new admin password:');
+            if (newPassword && newPassword.length >= 4) {
+                const confirmPassword = prompt('Confirm new password:');
+                if (newPassword === confirmPassword) {
+                    localStorage.setItem('adminPassword', newPassword);
+                    alert('Password changed successfully!');
+                } else {
+                    alert('Passwords do not match. Password not changed.');
+                }
+            } else if (newPassword) {
+                alert('Password must be at least 4 characters long.');
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('adminAuthenticated');
+            showSection('main-menu');
+            alert('You have been logged out of the Admin Panel.');
         }
 
         // Utility Functions

@@ -496,3 +496,29 @@ tr:hover {
     color: #e53e3e;
     border: 1px solid #e53e3e;
 }
+
+/* Password Input Styles */
+input[type="password"] {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+/* Status Indicator */
+.status-indicator {
+    font-size: 0.875rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.status-indicator.online {
+    background-color: #f0fff4;
+    color: #38a169;
+    border: 1px solid #38a169;
+}
+
+.status-indicator.offline {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #e53e3e;
+}
