@@ -29,7 +29,7 @@
             <p class="mb-2">Select an option to begin:</p>
             <div class="form-group">
                 <button class="btn btn-primary" onclick="showSection('admin-panel')">📊 Admin Panel</button>
-                <button class="btn btn-success" onclick="showSection('exam-config')">📝 Start Exam</button>
+                <button class="btn btn-success" onclick="showSection('exam-config')">📝 Start NREMT EMT Exam</button>
                 <button class="btn btn-secondary" onclick="showSection('results-view')">📈 View Results</button>
             </div>
         </div>
@@ -158,70 +158,71 @@
 
         <!-- Exam Configuration -->
         <div id="exam-config" class="card hidden">
-            <div class="card-header">Exam Configuration</div>
+            <div class="card-header">NREMT EMT Exam Configuration</div>
             
-            <div class="form-group">
-                <label for="exam-name">Exam Name:</label>
-                <input type="text" id="exam-name" placeholder="Enter exam name" required>
+            <div id="nremt-info" class="card" style="background: #ebf8ff; border-left: 4px solid #3182ce; margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px; color: #2c5282;">📋 NREMT EMT Exam Standards</h4>
+                <div id="nremt-details">
+                    <p><strong>Certification:</strong> Emergency Medical Technician (EMT)</p>
+                    <p><strong>Question Range:</strong> 70-120 (CAT) / 70 (Linear)</p>
+                    <p><strong>Time Limit:</strong> 120 minutes</p>
+                    <p><strong>Passing Score:</strong> 70%</p>
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="exam-mode">Exam Mode:</label>
+                <label for="exam-mode">NREMT EMT Exam Mode:</label>
                 <select id="exam-mode" required onchange="toggleModeOptions()">
-                    <option value="cat">CAT (Computer Adaptive Testing)</option>
-                    <option value="linear">Linear CBT</option>
+                    <option value="cat">CAT (Computer Adaptive Testing) - NREMT Standard</option>
+                    <option value="linear">Linear CBT - NREMT Standard</option>
                 </select>
-                <small>CAT: Adapts difficulty, no going back | Linear: Can skip/review questions</small>
-            </div>
-
-            <div class="form-group">
-                <label for="certification-level">Certification Level:</label>
-                <select id="certification-level" required onchange="updateQuestionLimits()">
-                    <option value="emr">EMR (Emergency Medical Responder)</option>
-                    <option value="emt">EMT (Emergency Medical Technician)</option>
-                    <option value="aemt">AEMT (Advanced EMT)</option>
-                    <option value="paramedic">Paramedic</option>
-                </select>
+                <small>CAT: Adapts difficulty, no going back (NREMT standard) | Linear: Can skip/review questions</small>
             </div>
 
             <div id="linear-options">
                 <div class="form-group">
                     <label for="time-limit">Time Limit (minutes):</label>
                     <input type="number" id="time-limit" value="120" min="30" max="240" required>
+                    <small>NREMT EMT standard time limit: 120 minutes</small>
                 </div>
 
                 <div class="form-group">
                     <label for="question-count">Number of Questions:</label>
                     <input type="number" id="question-count" value="70" min="10" max="150" required>
+                    <small>NREMT EMT standard question count: 70 questions</small>
                 </div>
 
                 <div class="form-group">
                     <label for="passing-score">Passing Score (%):</label>
                     <input type="number" id="passing-score" value="70" min="50" max="100" required>
+                    <small>NREMT standard passing score: 70%</small>
                 </div>
             </div>
 
             <div id="cat-options" class="hidden">
                 <div class="form-group">
-                    <label>Question Range:</label>
+                    <label>Question Range (NREMT EMT CAT Standard):</label>
                     <input type="number" id="min-questions" value="70" min="60" max="100" required> (Minimum)
                     <input type="number" id="max-questions" value="120" min="110" max="150" required> (Maximum)
+                    <small>NREMT CAT adapts question count based on performance</small>
                 </div>
 
                 <div class="form-group">
                     <label for="cat-time-limit">Time Limit (minutes):</label>
                     <input type="number" id="cat-time-limit" value="120" min="60" max="180" required>
+                    <small>NREMT EMT standard time limit: 120 minutes</small>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>
-                    <input type="checkbox" id="kiosk-mode"> Enable Kiosk Mode (Fullscreen, restricted access)
+                    <input type="checkbox" id="kiosk-mode"> Enable Kiosk Mode (Fullscreen, restricted access - NREMT Testing Standard)
                 </label>
+                <small>Recommended for official NREMT-style testing</small>
             </div>
 
             <div class="form-group">
-                <button class="btn btn-success" onclick="startExam()">🚀 Start Exam</button>
+                <button class="btn btn-success" onclick="startExam()">🚀 Start NREMT EMT Exam</button>
                 <button class="btn btn-secondary" onclick="showSection('main-menu')">⬅️ Back to Menu</button>
             </div>
         </div>
@@ -693,30 +694,22 @@
             }
         }
 
+        function updateNREMTSettings() {
+            // EMT-specific settings are now hardcoded
+            // No need for dynamic updates
+        }
+
         function updateQuestionLimits() {
-            const level = document.getElementById('certification-level').value;
-            const questionCount = document.getElementById('question-count');
-            const minQuestions = document.getElementById('min-questions');
-            const maxQuestions = document.getElementById('max-questions');
-
-            const limits = {
-                'emr': { linear: 90, cat: { min: 90, max: 110 } },
-                'emt': { linear: 70, cat: { min: 70, max: 120 } },
-                'aemt': { linear: 135, cat: { min: 135, max: 140 } },
-                'paramedic': { linear: 150, cat: { min: 80, max: 150 } }
-            };
-
-            questionCount.value = limits[level].linear;
-            minQuestions.value = limits[level].cat.min;
-            maxQuestions.value = limits[level].cat.max;
+            // EMT-specific settings are now hardcoded
+            // No need for dynamic updates
         }
 
         // Exam Functions
         function startExam() {
             const configuration = {
-                name: document.getElementById('exam-name').value || 'NREMT Practice Exam',
+                name: 'NREMT EMT Certification Exam',
                 mode: document.getElementById('exam-mode').value,
-                level: document.getElementById('certification-level').value,
+                level: 'emt',
                 kioskMode: document.getElementById('kiosk-mode').checked,
                 timeLimit: 0,
                 questionCount: 0,
