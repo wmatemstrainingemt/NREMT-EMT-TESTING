@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NREMT Kiosk Testing System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a5f">
+    <meta name="description" content="Professional NREMT CBT-style testing system for EMS certification">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <h1>🏥 NREMT Kiosk Testing System</h1>
+            <div id="header-actions">
+                <span id="connection-status" class="status-indicator"></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Main Menu -->
+        <div id="main-menu" class="card">
+            <div class="card-header">Welcome to NREMT Kiosk Testing</div>
+            <p class="mb-2">Select an option to begin:</p>
+            <div class="form-group">
+                <button class="btn btn-primary" onclick="showSection('admin')">📊 Admin Panel</button>
+                <button class="btn btn-success" onclick="showSection('exam-config')">📝 Start Exam</button>
+                <button class="btn btn-secondary" onclick="showSection('results-view')">📈 View Results</button>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="card hidden">
+            <div class="card-header">Admin Panel - Question Management</div>
+            
+            <div class="form-group">
+                <button class="btn btn-success" onclick="showAddQuestionForm()">➕ Add New Question</button>
+                <button class="btn btn-primary" onclick="showBulkImport()">📥 Bulk Import Questions</button>
+                <button class="btn btn-warning" onclick="exportQuestions()">📤 Export Questions</button>
+            </div>
+
+            <!-- Question Filter -->
+            <div class="form-group">
+                <label>Filter Questions:</label>
+                <select id="filter-category" onchange="filterQuestions()">
+                    <option value="all">All Categories</option>
+                    <option value="airway">Airway & Breathing</option>
+                    <option value="cardiology">Cardiology</option>
+                    <option value="medical">Medical Emergencies</option>
+                    <option value="trauma">Trauma</option>
+                    <option value="ob-gyn">OB/GYN</option>
+                    <option value="pediatrics">Pediatrics</option>
+                    <option value="operations">Operations</option>
+                </select>
+                <select id="filter-difficulty" onchange="filterQuestions()">
+                    <option value="all">All Difficulty Levels</option>
+                    <option value="1">Level 1 (Below Passing)</option>
+                    <option value="2">Level 2 (At Passing)</option>
+                    <option value="3">Level 3 (Above Passing)</option>
+                </select>
+            </div>
+
+            <!-- Questions Table -->
+            <div id="questions-table-container">
+                <table id="questions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Question</th>
+                            <th>Category</th>
+                            <th>Difficulty</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questions-tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-2">
+                <button class="btn btn-secondary" onclick="showSection('main-menu')">⬅️ Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Add Question Form -->
+        <div id="add-question-form" class="card hidden">
+            <div class="card-header">Add New Question</div>
+            <form id="question-form" onsubmit="saveQuestion(event)">
+                <div class="form-group">
+                    <label for="question-text">Question Text:</label>
+                    <textarea id="question-text" rows="4" required placeholder="Enter the question text..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="question-category">Category:</label>
+                    <select id="question-category" required>
+                        <option value="">Select Category</option>
+                        <option value="airway">Airway & Breathing</option>
+                        <option value="cardiology">Cardiology</option>
+                        <option value="medical">Medical Emergencies</option>
+                        <option value="trauma">Trauma</option>
+                        <option value="ob-gyn">OB/GYN</option>
+                        <option value="pediatrics">Pediatrics</option>
+                        <option value="operations">Operations</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="question-difficulty">Difficulty Level:</label>
+                    <select id="question-difficulty" required>
+                        <option value="">Select Difficulty</option>
+                        <option value="1">Level 1 (Below Passing)</option>
+                        <option value="2">Level 2 (At Passing)</option>
+                        <option value="3">Level 3 (Above Passing)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Options:</label>
+                    <div id="options-container">
+                        <input type="text" class="option-input" placeholder="Option A" required>
+                        <input type="text" class="option-input" placeholder="Option B" required>
+                        <input type="text" class="option-input" placeholder="Option C" required>
+                        <input type="text" class="option-input" placeholder="Option D" required>
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-2" onclick="addOption()">+ Add Option</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="correct-answer">Correct Answer:</label>
+                    <select id="correct-answer" required>
+                        <option value="">Select Correct Answer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="question-explanation">Explanation:</label>
+                    <textarea id="question-explanation" rows="3" placeholder="Provide explanation for the correct answer..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">💾 Save Question</button>
+                    <button type="button" class="btn btn-secondary" onclick="showSection('admin')">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Exam Configuration -->
+        <div id="exam-config" class="card hidden">
+            <div class="card-header">Exam Configuration</div>
+            
+            <div class="form-group">
+                <label for="exam-name">Exam Name:</label>
+                <input type="text" id="exam-name" placeholder="Enter exam name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="exam-mode">Exam Mode:</label>
+                <select id="exam-mode" required onchange="toggleModeOptions()">
+                    <option value="cat">CAT (Computer Adaptive Testing)</option>
+                    <option value="linear">Linear CBT</option>
+                </select>
+                <small>CAT: Adapts difficulty, no going back | Linear: Can skip/review questions</small>
+            </div>
+
+            <div class="form-group">
+                <label for="certification-level">Certification Level:</label>
+                <select id="certification-level" required onchange="updateQuestionLimits()">
+                    <option value="emr">EMR (Emergency Medical Responder)</option>
+                    <option value="emt">EMT (Emergency Medical Technician)</option>
+                    <option value="aemt">AEMT (Advanced EMT)</option>
+                    <option value="paramedic">Paramedic</option>
+                </select>
+            </div>
+
+            <div id="linear-options">
+                <div class="form-group">
+                    <label for="time-limit">Time Limit (minutes):</label>
+                    <input type="number" id="time-limit" value="120" min="30" max="240" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="question-count">Number of Questions:</label>
+                    <input type="number" id="question-count" value="70" min="10" max="150" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="passing-score">Passing Score (%):</label>
+                    <input type="number" id="passing-score" value="70" min="50" max="100" required>
+                </div>
+            </div>
+
+            <div id="cat-options" class="hidden">
+                <div class="form-group">
+                    <label>Question Range:</label>
+                    <input type="number" id="min-questions" value="70" min="60" max="100" required> (Minimum)
+                    <input type="number" id="max-questions" value="120" min="110" max="150" required> (Maximum)
+                </div>
+
+                <div class="form-group">
+                    <label for="cat-time-limit">Time Limit (minutes):</label>
+                    <input type="number" id="cat-time-limit" value="120" min="60" max="180" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="kiosk-mode"> Enable Kiosk Mode (Fullscreen, restricted access)
+                </label>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-success" onclick="startExam()">🚀 Start Exam</button>
+                <button class="btn btn-secondary" onclick="showSection('main-menu')">⬅️ Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Exam Interface -->
+        <div id="exam-interface" class="hidden">
+            <div id="kiosk-timer" class="kiosk-timer hidden"></div>
+            
+            <div class="timer-display" id="timer-display">00:00:00</div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar">0%</div>
+            </div>
+
+            <div class="question-container">
+                <div class="card-header">
+                    Question <span id="current-question-num">1</span> of <span id="total-questions">70</span>
+                    <span id="question-indicator" class="hidden" style="float: right; color: var(--accent-color);">● Current</span>
+                </div>
+
+                <div class="question-text" id="exam-question-text">
+                    Loading question...
+                </div>
+
+                <ul class="options-list" id="exam-options">
+                    <!-- Options will be populated dynamically -->
+                </ul>
+
+                <div class="mt-2">
+                    <button class="btn btn-warning" id="mark-btn" onclick="markQuestion()">🚩 Mark for Review</button>
+                </div>
+            </div>
+
+            <!-- Question Navigation Grid (Linear Mode) -->
+            <div id="question-nav-grid" class="question-grid hidden">
+                <!-- Grid items will be populated dynamically -->
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prev-btn" onclick="previousQuestion()" disabled>⬅️ Previous</button>
+                <div id="nav-controls">
+                    <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">Next ➡️</button>
+                    <button class="btn btn-success hidden" id="submit-btn" onclick="submitExam()">✅ Submit Exam</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results View -->
+        <div id="results-view" class="card hidden">
+            <div class="card-header">Exam Results</div>
+            
+            <div id="results-history">
+                <table id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Exam Name</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Questions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-2">
+                <button class="btn btn-secondary" onclick="showSection('main-menu')">⬅️ Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Detailed Results -->
+        <div id="detailed-results" class="card hidden">
+            <div class="card-header">Detailed Results</div>
+            
+            <div class="score-summary">
+                <h2 id="result-exam-name">Exam Name</h2>
+                <div class="score-display" id="final-score">85%</div>
+                <p id="result-status" class="result-pass">PASSED</p>
+                <p>Time Taken: <span id="time-taken">00:00:00</span></p>
+                <p>Questions Answered: <span id="questions-answered">70</span>/<span id="total-questions-result">70</span></p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Performance by Category</div>
+                <div id="category-performance"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Question Review</div>
+                <div id="question-review"></div>
+            </div>
+
+            <div class="mt-2">
+                <button class="btn btn-primary" onclick="printResults()">🖨️ Print Results</button>
+                <button class="btn btn-secondary" onclick="showSection('results-view')">⬅️ Back to Results</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modal-title">Confirm Action</div>
+            <p id="modal-message">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-danger" id="modal-confirm-btn" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Application State
+        let questions = [];
+        let examResults = [];
+        let currentExam = {
+            active: false,
+            mode: 'cat',
+            currentQuestionIndex: 0,
+            answers: {},
+            markedQuestions: new Set(),
+            timeRemaining: 0,
+            timerInterval: null,
+            startTime: null,
+            configuration: {}
+        };
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuestions();
+            loadResults();
+            updateQuestionsTable();
+            updateResultsTable();
+        });
+
+        // Storage Functions
+        function loadQuestions() {
+            const stored = localStorage.getItem('nremt_questions');
+            if (stored) {
+                questions = JSON.parse(stored);
+            } else {
+                // Load sample questions
+                questions = loadSampleQuestions();
+                saveQuestions();
+            }
+        }
+
+        function saveQuestions() {
+            localStorage.setItem('nremt_questions', JSON.stringify(questions));
+        }
+
+        function loadResults() {
+            const stored = localStorage.getItem('nremt_results');
+            if (stored) {
+                examResults = JSON.parse(stored);
+            }
+        }
+
+        function saveResults() {
+            localStorage.setItem('nremt_results', JSON.stringify(examResults));
+        }
+
+        // Sample Questions
+        function loadSampleQuestions() {
+            return [
+                {
+                    id: 1,
+                    text: "Your patient fell while skateboarding and has a painful, swollen, deformed lower arm. You are unable to palpate the radial pulse. You should immediately:",
+                    category: "trauma",
+                    difficulty: 2,
+                    options: [
+                        "Apply cold packs",
+                        "Align the arm with gentle traction",
+                        "Splint the arm in the position found",
+                        "Ask the patient to try moving the arm"
+                    ],
+                    correctAnswer: 1,
+                    explanation: "When there is a pulseless extremity with deformity, immediate realignment with gentle traction is necessary to restore circulation before splinting."
+                },
+                {
+                    id: 2,
+                    text: "Your patient is a disoriented 86 year old male who has a history of terminal brain cancer. He fell out of bed and complains of severe right hip pain. His wife called 9-1-1 for assistance in putting him back to bed. She tells you that he has DNR orders and that she does not want him transported. You should initially:",
+                    category: "medical",
+                    difficulty: 2,
+                    options: [
+                        "Ask to see the DNR orders",
+                        "Explain why he needs to be transported",
+                        "Have her sign a refusal form",
+                        "Call for law enforcement back-up"
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Even with DNR orders, you must explain the medical necessity of transport for the hip injury and ensure the patient understands the consequences of refusal."
+                },
+                {
+                    id: 3,
+                    text: "You are called to a scene where law enforcement officers have detained a man who they thought was drunk. They called you because he has a history of diabetes. You administer oral glucose and within a minute the patient becomes unresponsive. You should:",
+                    category: "medical",
+                    difficulty: 2,
+                    options: [
+                        "Remain at the scene under law enforcement authority and request ALS back-up",
+                        "Leave the glucose in place, complete a primary survey and transport",
+                        "Open his airway with an oropharyngeal airway and ventilate him",
+                        "Suction his mouth and begin transport"
+                    ],
+                    correctAnswer: 3,
+                    explanation: "The patient likely aspirated during the glucose administration. Immediate suctioning and transport are priority interventions."
+                },
+                {
+                    id: 4,
+                    text: "Which of the following is the MOST appropriate method for assessing a patient's level of consciousness?",
+                    category: "operations",
+                    difficulty: 1,
+                    options: [
+                        "Glasgow Coma Scale",
+                        "AVPU scale",
+                        "Pupillary response",
+                        "Motor response testing"
+                    ],
+                    correctAnswer: 1,
+                    explanation: "AVPU (Alert, Verbal, Painful, Unresponsive) is the most appropriate initial assessment tool in the field setting."
+                },
+                {
+                    id: 5,
+                    text: "A 45-year-old male presents with crushing chest pain that radiates to his left arm. He is diaphoretic and short of breath. Which of the following is your FIRST priority?",
+                    category: "cardiology",
+                    difficulty: 2,
+                    options: [
+                        "Administer aspirin",
+                        "Obtain 12-lead ECG",
+                        "Administer nitroglycerin",
+                        "Assess ABCs and oxygenation"
+                    ],
+                    correctAnswer: 3,
+                    explanation: "Airway, breathing, and circulation (ABCs) must always be assessed first in any patient care scenario."
+                }
+            ];
+        }
+
+        // Navigation Functions
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = ['main-menu', 'admin-panel', 'add-question-form', 'exam-config', 'exam-interface', 'results-view', 'detailed-results'];
+            sections.forEach(section => {
+                document.getElementById(section).classList.add('hidden');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Update header actions
+            updateHeaderActions(sectionId);
+        }
+
+        function updateHeaderActions(sectionId) {
+            const headerActions = document.getElementById('header-actions');
+            if (sectionId === 'exam-interface' && currentExam.configuration.kioskMode) {
+                headerActions.innerHTML = `
+                    <button class="btn btn-danger" onclick="exitKiosk()">🚪 Exit Kiosk Mode</button>
+                `;
+            } else {
+                headerActions.innerHTML = '';
+            }
+        }
+
+        // Question Management Functions
+        function updateQuestionsTable() {
+            const tbody = document.getElementById('questions-tbody');
+            tbody.innerHTML = '';
+
+            const categoryFilter = document.getElementById('filter-category').value;
+            const difficultyFilter = document.getElementById('filter-difficulty').value;
+
+            const filteredQuestions = questions.filter(q => {
+                const categoryMatch = categoryFilter === 'all' || q.category === categoryFilter;
+                const difficultyMatch = difficultyFilter === 'all' || q.difficulty === parseInt(difficultyFilter);
+                return categoryMatch && difficultyMatch;
+            });
+
+            filteredQuestions.forEach(question => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${question.id}</td>
+                    <td>${question.text.substring(0, 50)}...</td>
+                    <td>${question.category}</td>
+                    <td>Level ${question.difficulty}</td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="editQuestion(${question.id})">Edit</button>
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem;" onclick="deleteQuestion(${question.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterQuestions() {
+            updateQuestionsTable();
+        }
+
+        function showAddQuestionForm() {
+            document.getElementById('question-form').reset();
+            updateCorrectAnswerOptions();
+            showSection('add-question-form');
+        }
+
+        function addOption() {
+            const container = document.getElementById('options-container');
+            const optionCount = container.children.length;
+            const optionLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            
+            if (optionCount < 8) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'option-input';
+                input.placeholder = `Option ${optionLetters[optionCount]}`;
+                input.required = true;
+                input.addEventListener('input', updateCorrectAnswerOptions);
+                container.appendChild(input);
+            }
+        }
+
+        function updateCorrectAnswerOptions() {
+            const options = document.querySelectorAll('.option-input');
+            const select = document.getElementById('correct-answer');
+            const optionLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Select Correct Answer</option>';
+            
+            options.forEach((option, index) => {
+                if (option.value.trim()) {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = index;
+                    optionElement.textContent = `${optionLetters[index]} - ${option.value.substring(0, 30)}`;
+                    select.appendChild(optionElement);
+                }
+            });
+
+            if (currentValue !== '') {
+                select.value = currentValue;
+            }
+        }
+
+        function saveQuestion(event) {
+            event.preventDefault();
+            
+            const options = Array.from(document.querySelectorAll('.option-input'))
+                .map(input => input.value.trim())
+                .filter(value => value !== '');
+
+            if (options.length < 2) {
+                alert('Please provide at least 2 options');
+                return;
+            }
+
+            const question = {
+                id: Date.now(),
+                text: document.getElementById('question-text').value,
+                category: document.getElementById('question-category').value,
+                difficulty: parseInt(document.getElementById('question-difficulty').value),
+                options: options,
+                correctAnswer: parseInt(document.getElementById('correct-answer').value),
+                explanation: document.getElementById('question-explanation').value
+            };
+
+            questions.push(question);
+            saveQuestions();
+            updateQuestionsTable();
+            
+            alert('Question saved successfully!');
+            showSection('admin-panel');
+        }
+
+        function editQuestion(questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (!question) return;
+
+            document.getElementById('question-text').value = question.text;
+            document.getElementById('question-category').value = question.category;
+            document.getElementById('question-difficulty').value = question.difficulty;
+            document.getElementById('question-explanation').value = question.explanation;
+
+            // Clear and populate options
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'option-input';
+                input.value = option;
+                input.required = true;
+                input.addEventListener('input', updateCorrectAnswerOptions);
+                container.appendChild(input);
+            });
+
+            document.getElementById('correct-answer').value = question.correctAnswer;
+            updateCorrectAnswerOptions();
+
+            // Remove old question and show form
+            questions = questions.filter(q => q.id !== questionId);
+            showSection('add-question-form');
+        }
+
+        function deleteQuestion(questionId) {
+            showModal('Delete Question', 'Are you sure you want to delete this question?', () => {
+                questions = questions.filter(q => q.id !== questionId);
+                saveQuestions();
+                updateQuestionsTable();
+            });
+        }
+
+        function exportQuestions() {
+            const dataStr = JSON.stringify(questions, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'nremt_questions.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // Exam Configuration Functions
+        function toggleModeOptions() {
+            const mode = document.getElementById('exam-mode').value;
+            const linearOptions = document.getElementById('linear-options');
+            const catOptions = document.getElementById('cat-options');
+
+            if (mode === 'cat') {
+                linearOptions.classList.add('hidden');
+                catOptions.classList.remove('hidden');
+            } else {
+                linearOptions.classList.remove('hidden');
+                catOptions.classList.add('hidden');
+            }
+        }
+
+        function updateQuestionLimits() {
+            const level = document.getElementById('certification-level').value;
+            const questionCount = document.getElementById('question-count');
+            const minQuestions = document.getElementById('min-questions');
+            const maxQuestions = document.getElementById('max-questions');
+
+            const limits = {
+                'emr': { linear: 90, cat: { min: 90, max: 110 } },
+                'emt': { linear: 70, cat: { min: 70, max: 120 } },
+                'aemt': { linear: 135, cat: { min: 135, max: 140 } },
+                'paramedic': { linear: 150, cat: { min: 80, max: 150 } }
+            };
+
+            questionCount.value = limits[level].linear;
+            minQuestions.value = limits[level].cat.min;
+            maxQuestions.value = limits[level].cat.max;
+        }
+
+        // Exam Functions
+        function startExam() {
+            const configuration = {
+                name: document.getElementById('exam-name').value || 'NREMT Practice Exam',
+                mode: document.getElementById('exam-mode').value,
+                level: document.getElementById('certification-level').value,
+                kioskMode: document.getElementById('kiosk-mode').checked,
+                timeLimit: 0,
+                questionCount: 0,
+                passingScore: parseInt(document.getElementById('passing-score').value)
+            };
+
+            if (configuration.mode === 'linear') {
+                configuration.timeLimit = parseInt(document.getElementById('time-limit').value) * 60; // Convert to seconds
+                configuration.questionCount = parseInt(document.getElementById('question-count').value);
+            } else {
+                configuration.timeLimit = parseInt(document.getElementById('cat-time-limit').value) * 60;
+                configuration.minQuestions = parseInt(document.getElementById('min-questions').value);
+                configuration.maxQuestions = parseInt(document.getElementById('max-questions').value);
+            }
+
+            if (questions.length < configuration.questionCount) {
+                alert('Not enough questions available in the database.');
+                return;
+            }
+
+            // Initialize exam
+            currentExam = {
+                active: true,
+                mode: configuration.mode,
+                configuration: configuration,
+                currentQuestionIndex: 0,
+                answers: {},
+                markedQuestions: new Set(),
+                timeRemaining: configuration.timeLimit,
+                timerInterval: null,
+                startTime: new Date(),
+                examQuestions: selectQuestions(configuration)
+            };
+
+            // Enable kiosk mode if selected
+            if (configuration.kioskMode) {
+                document.body.classList.add('kiosk-mode');
+                document.getElementById('kiosk-timer').classList.remove('hidden');
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log('Fullscreen not available');
+                    });
+                }
+            } else {
+                document.body.classList.remove('kiosk-mode');
+                document.getElementById('kiosk-timer').classList.add('hidden');
+            }
+
+            // Show exam interface
+            showSection('exam-interface');
+            startTimer();
+            loadQuestion(0);
+            updateQuestionNavGrid();
+        }
+
+        function selectQuestions(configuration) {
+            let selectedQuestions = [];
+            
+            if (configuration.mode === 'linear') {
+                // Select questions balanced across categories
+                const categories = ['airway', 'cardiology', 'medical', ' trauma', 'ob-gyn', 'pediatrics', 'operations'];
+                const questionsPerCategory = Math.ceil(configuration.questionCount / categories.length);
+                
+                categories.forEach(category => {
+                    const categoryQuestions = questions.filter(q => q.category === category);
+                    const shuffled = categoryQuestions.sort(() => Math.random() - 0.5);
+                    selectedQuestions = selectedQuestions.concat(shuffled.slice(0, questionsPerCategory));
+                });
+
+                // Shuffle all selected questions
+                selectedQuestions = selectedQuestions.sort(() => Math.random() - 0.5);
+                selectedQuestions = selectedQuestions.slice(0, configuration.questionCount);
+            } else {
+                // CAT mode: start with medium difficulty questions
+                const mediumQuestions = questions.filter(q => q.difficulty === 2);
+                const shuffled = mediumQuestions.sort(() => Math.random() - 0.5);
+                selectedQuestions = shuffled.slice(0, 10);
+            }
+
+            return selectedQuestions;
+        }
+
+        function loadQuestion(index) {
+            if (index < 0 || index >= currentExam.examQuestions.length) return;
+
+            const question = currentExam.examQuestions[index];
+            currentExam.currentQuestionIndex = index;
+
+            // Update question display
+            document.getElementById('current-question-num').textContent = index + 1;
+            document.getElementById('total-questions').textContent = currentExam.examQuestions.length;
+            document.getElementById('exam-question-text').textContent = question.text;
+
+            // Update options
+            const optionsList = document.getElementById('exam-options');
+            optionsList.innerHTML = '';
+            const optionLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+            question.options.forEach((option, optionIndex) => {
+                const li = document.createElement('li');
+                li.className = 'option-item';
+                
+                if (currentExam.answers[index] === optionIndex) {
+                    li.classList.add('selected');
+                }
+
+                li.innerHTML = `
+                    <span class="option-label">${optionLetters[optionIndex]}</span>
+                    <span>${option}</span>
+                `;
+                
+                li.onclick = () => selectAnswer(index, optionIndex);
+                optionsList.appendChild(li);
+            });
+
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = index === 0;
+            
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (index === currentExam.examQuestions.length - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+
+            // Update mark button
+            const markBtn = document.getElementById('mark-btn');
+            if (currentExam.markedQuestions.has(index)) {
+                markBtn.classList.add('btn-warning');
+                markBtn.textContent = '🚩 Unmark';
+            } else {
+                markBtn.classList.remove('btn-warning');
+                markBtn.textContent = '🚩 Mark for Review';
+            }
+
+            // Update progress bar
+            const progress = ((index + 1) / currentExam.examQuestions.length) * 100;
+            document.getElementById('progress-bar').textContent = `${Math.round(progress)}%`;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            // Update question nav grid
+            updateQuestionNavGrid();
+        }
+
+        function selectAnswer(questionIndex, optionIndex) {
+            currentExam.answers[questionIndex] = optionIndex;
+            loadQuestion(questionIndex);
+        }
+
+        function markQuestion() {
+            const index = currentExam.currentQuestionIndex;
+            
+            if (currentExam.markedQuestions.has(index)) {
+                currentExam.markedQuestions.delete(index);
+            } else {
+                currentExam.markedQuestions.add(index);
+            }
+            
+            loadQuestion(index);
+        }
+
+        function nextQuestion() {
+            if (currentExam.currentQuestionIndex < currentExam.examQuestions.length - 1) {
+                loadQuestion(currentExam.currentQuestionIndex + 1);
+            }
+        }
+
+        function previousQuestion() {
+            if (currentExam.currentQuestionIndex > 0) {
+                loadQuestion(currentExam.currentQuestionIndex - 1);
+            }
+        }
+
+        function goToQuestion(index) {
+            loadQuestion(index);
+        }
+
+        function updateQuestionNavGrid() {
+            const grid = document.getElementById('question-nav-grid');
+            grid.innerHTML = '';
+
+            currentExam.examQuestions.forEach((question, index) => {
+                const item = document.createElement('div');
+                item.className = 'question-nav-item';
+                item.textContent = index + 1;
+
+                if (index === currentExam.currentQuestionIndex) {
+                    item.classList.add('current');
+                } else if (currentExam.markedQuestions.has(index)) {
+                    item.classList.add('marked');
+                } else if (currentExam.answers[index] !== undefined) {
+                    item.classList.add('answered');
+                }
+
+                item.onclick = () => goToQuestion(index);
+                grid.appendChild(item);
+            });
+
+            // Show grid in linear mode
+            if (currentExam.mode === 'linear') {
+                grid.classList.remove('hidden');
+            } else {
+                grid.classList.add('hidden');
+            }
+        }
+
+        // Timer Functions
+        function startTimer() {
+            updateTimerDisplay();
+            
+            currentExam.timerInterval = setInterval(() => {
+                currentExam.timeRemaining--;
+                updateTimerDisplay();
+
+                if (currentExam.timeRemaining <= 0) {
+                    clearInterval(currentExam.timerInterval);
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(currentExam.timeRemaining / 3600);
+            const minutes = Math.floor((currentExam.timeRemaining % 3600) / 60);
+            const seconds = currentExam.timeRemaining % 60;
+
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('timer-display').textContent = timeString;
+            
+            if (currentExam.configuration.kioskMode) {
+                document.getElementById('kiosk-timer').textContent = timeString;
+            }
+
+            // Update timer color based on remaining time
+            const timerDisplay = document.getElementById('timer-display');
+            timerDisplay.classList.remove('timer-warning', 'timer-danger');
+            
+            if (currentExam.timeRemaining <= 300) { // 5 minutes
+                timerDisplay.classList.add('timer-danger');
+            } else if (currentExam.timeRemaining <= 600) { // 10 minutes
+                timerDisplay.classList.add('timer-warning');
+            }
+        }
+
+        // Exam Submission
+        function submitExam() {
+            clearInterval(currentExam.timerInterval);
+            
+            const unansweredCount = currentExam.examQuestions.length - Object.keys(currentExam.answers).length;
+            
+            if (unansweredCount > 0) {
+                if (!confirm(`You have ${unansweredCount} unanswered questions. Are you sure you want to submit?`)) {
+                    return;
+                }
+            }
+
+            calculateResults();
+        }
+
+        function calculateResults() {
+            let correctCount = 0;
+            const categoryPerformance = {};
+            const detailedAnswers = [];
+
+            currentExam.examQuestions.forEach((question, index) => {
+                const userAnswer = currentExam.answers[index];
+                const isCorrect = userAnswer === question.correctAnswer;
+                
+                if (isCorrect) {
+                    correctCount++;
+                }
+
+                // Track category performance
+                if (!categoryPerformance[question.category]) {
+                    categoryPerformance[question.category] = { correct: 0, total: 0 };
+                }
+                categoryPerformance[question.category].total++;
+                if (isCorrect) {
+                    categoryPerformance[question.category].correct++;
+                }
+
+                detailedAnswers.push({
+                    question: question,
+                    userAnswer: userAnswer,
+                    isCorrect: isCorrect,
+                    marked: currentExam.markedQuestions.has(index)
+                });
+            });
+
+            const score = Math.round((correctCount / currentExam.examQuestions.length) * 100);
+            const passed = score >= currentExam.configuration.passingScore;
+
+            const endTime = new Date();
+            const timeTaken = endTime - currentExam.startTime;
+
+            const result = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                examName: currentExam.configuration.name,
+                score: score,
+                passed: passed,
+                totalQuestions: currentExam.examQuestions.length,
+                correctAnswers: correctCount,
+                timeTaken: timeTaken,
+                categoryPerformance: categoryPerformance,
+                detailedAnswers: detailedAnswers,
+                configuration: currentExam.configuration
+            };
+
+            examResults.push(result);
+            saveResults();
+
+            // Show results
+            showDetailedResults(result.id);
+
+            // Exit kiosk mode
+            exitKiosk();
+        }
+
+        function showDetailedResults(resultId) {
+            const result = examResults.find(r => r.id === resultId);
+            if (!result) return;
+
+            document.getElementById('result-exam-name').textContent = result.examName;
+            document.getElementById('final-score').textContent = `${result.score}%`;
+            
+            const statusElement = document.getElementById('result-status');
+            statusElement.textContent = result.passed ? 'PASSED' : 'FAILED';
+            statusElement.className = result.passed ? 'result-pass' : 'result-fail';
+
+            const timeTaken = new Date(result.timeTaken);
+            const hours = Math.floor(result.timeTaken / 3600000);
+            const minutes = Math.floor((result.timeTaken % 3600000) / 60000);
+            const seconds = Math.floor((result.timeTaken % 60000) / 1000);
+            document.getElementById('time-taken').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            document.getElementById('questions-answered').textContent = result.correctAnswers + (result.totalQuestions - Object.keys(result.detailedAnswers.filter(a => a.userAnswer !== undefined)).length);
+            document.getElementById('total-questions-result').textContent = result.totalQuestions;
+
+            // Category performance
+            const categoryContainer = document.getElementById('category-performance');
+            categoryContainer.innerHTML = '';
+
+            Object.entries(result.categoryPerformance).forEach(([category, performance]) => {
+                const percentage = Math.round((performance.correct / performance.total) * 100);
+                const div = document.createElement('div');
+                div.style.marginBottom = '15px';
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <strong>${category.toUpperCase()}</strong>
+                        <span>${performance.correct}/${performance.total} (${percentage}%)</span>
+                    </div>
+                    <div class="progress-container" style="height: 10px; margin: 5px 0;">
+                        <div class="progress-bar" style="width: ${percentage}%; height: 100%;"></div>
+                    </div>
+                `;
+                categoryContainer.appendChild(div);
+            });
+
+            // Question review
+            const reviewContainer = document.getElementById('question-review');
+            reviewContainer.innerHTML = '';
+
+            result.detailedAnswers.forEach((answer, index) => {
+                const div = document.createElement('div');
+                div.className = 'question-container';
+                div.style.marginBottom = '10px';
+                
+                const optionLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+                const correctOption = optionLetters[answer.question.correctAnswer];
+                const userOption = answer.userAnswer !== undefined ? optionLetters[answer.userAnswer] : 'Not Answered';
+                
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong>Question ${index + 1}</strong>
+                        <span style="padding: 4px 12px; border-radius: 4px; background: ${answer.isCorrect ? '#f0fff4' : '#fff5f5'}; color: ${answer.isCorrect ? '#38a169' : '#e53e3e'}; font-weight: 600;">
+                            ${answer.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                        </span>
+                    </div>
+                    <p style="margin-bottom: 10px;">${answer.question.text}</p>
+                    <p><strong>Your Answer:</strong> ${userOption}</p>
+                    <p><strong>Correct Answer:</strong> ${correctOption}</p>
+                    ${answer.question.explanation ? `<p style="margin-top: 10px; padding: 10px; background: #f7fafc; border-left: 3px solid var(--accent-color);"><strong>Explanation:</strong> ${answer.question.explanation}</p>` : ''}
+                    ${answer.marked ? '<p style="color: var(--warning-color); font-weight: 600;">🚩 Marked for Review</p>' : ''}
+                `;
+                reviewContainer.appendChild(div);
+            });
+
+            showSection('detailed-results');
+        }
+
+        function updateResultsTable() {
+            const tbody = document.getElementById('results-tbody');
+            tbody.innerHTML = '';
+
+            const sortedResults = [...examResults].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedResults.forEach(result => {
+                const row = document.createElement('tr');
+                const date = new Date(result.date).toLocaleDateString();
+                
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td>${result.examName}</td>
+                    <td>${result.score}%</td>
+                    <td><span style="padding: 4px 12px; border-radius: 4px; background: ${result.passed ? '#f0fff4' : '#fff5f5'}; color: ${result.passed ? '#38a169' : '#e53e3e'}; font-weight: 600;">${result.passed ? 'PASSED' : 'FAILED'}</span></td>
+                    <td>${result.correctAnswers}/${result.totalQuestions}</td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="showDetailedResults(${result.id})">View</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function printResults() {
+            window.print();
+        }
+
+        // Kiosk Mode Functions
+        function exitKiosk() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => {
+                    console.log('Exit fullscreen failed');
+                });
+            }
+            document.body.classList.remove('kiosk-mode');
+            document.getElementById('kiosk-timer').classList.add('hidden');
+            clearInterval(currentExam.timerInterval);
+            currentExam.active = false;
+            updateHeaderActions('');
+        }
+
+        // Modal Functions
+        function showModal(title, message, onConfirm) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('confirm-modal').classList.add('active');
+            
+            document.getElementById('modal-confirm-btn').onclick = function() {
+                onConfirm();
+                closeModal();
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('confirm-modal').classList.remove('active');
+        }
+
+        // Utility Functions
+        function showBulkImport() {
+            alert('Bulk import feature coming soon. Use the Export feature to see the JSON format for importing.');
+        }
+
+        // Add event listeners for dynamic options
+        document.querySelectorAll('.option-input').forEach(input => {
+            input.addEventListener('input', updateCorrectAnswerOptions);
+        });
+
+        // Prevent browser back button during exam
+        window.addEventListener('popstate', function(e) {
+            if (currentExam.active) {
+                e.preventDefault();
+                history.pushState(null, null, location.href);
+            }
+        });
+    </script>
+    
+    <!-- Service Worker Registration -->
+    <script src="sw-register.js"></script>
+</body>
+</html>
